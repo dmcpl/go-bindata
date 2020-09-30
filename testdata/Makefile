@@ -1,12 +1,12 @@
 FILES:=$(wildcard out/*.go)
 
 .PHONY: check
-check: errcheck golint $(FILES:.go=.checked)
+check: errcheck golint govet $(FILES:.go=.checked)
 
 out/%.checked: out/%.go
 	errcheck $<
-	go vet --all $<
-	go vet --shadow $<
+	go vet -all $<
+	go vet -vettool=$(which shadow) $<
 	golint $<
 	gofmt -d $<
 
@@ -32,4 +32,7 @@ errcheck:
 	go get github.com/kisielk/errcheck
 
 golint:
-	go get github.com/golang/lint/golint
+	go get golang.org/x/lint/golint
+
+govet:
+	go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow
